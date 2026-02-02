@@ -85,6 +85,38 @@
         animation: spin 1s linear infinite;
       }
 
+      .tab-pane {
+        display: none;
+      }
+
+      /* Show the active tab */
+      .tab-pane.active {
+        display: block;
+      }
+
+      /* Tab Button Styling */
+      .tab-nav {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 10px;
+      }
+
+      .tab-btn {
+        padding: 8px 16px;
+        cursor: pointer;
+        border: none;
+        background: #f0f0f0;
+        border-radius: 4px;
+      }
+
+      .tab-btn.active {
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+      }
+
       @keyframes spin {
         0% {
           transform: rotate(0deg);
@@ -97,21 +129,41 @@
   </head>
   <body>
     <h2>Summary AI</h2>
-    <div class="options">
-      <select id="summary-type">
-        <option value="brief">Brief Summary</option>
-        <option value="detailed">Detailed Summary</option>
-        <option value="bullets">Bullet Points</option>
-      </select>
-      <button id="summarize">Summarize This Page</button>
-      <button id="copy-btn">Copy Summary</button>
+    <div class="tab-nav">
+      <button class="tab-btn active" data-target="summary-tab">Summarizer</button>
+      <button class="tab-btn" data-target="chat-tab">Chat AI</button>
     </div>
 
-    <div id="result">
-      Select a summary type and click 'Summarize This Page' to generate a
-      summary.
-    </div>
+    <div class="tab-content">
+      <div id="summary-tab" class="tab-pane active">
+        <div class="summary-container">
+          <div class="options">
+            <select id="summary-type">
+              <option value="brief">Brief Summary</option>
+              <option value="detailed">Detailed Summary</option>
+              <option value="bullets">Bullet Points</option>
+            </select>
+            <button id="summarize">Summarize This Page</button>
+            <button id="copy-btn">Copy</button>
+          </div>
+          <div id="result">
+            Select a summary type and click 'Summarize' to start.
+          </div>
+        </div>
+      </div>
 
+      <div id="chat-tab" class="tab-pane">
+        <div class="chat-container">
+          <div id="chat-history" style="height: 200px; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 10px; padding: 5px;">
+            </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatQuery" placeholder="Ask about the article...">
+            <button id="query-btn">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
     <script src="config.js"></script>
     <script src="popup.js"></script>
   </body>

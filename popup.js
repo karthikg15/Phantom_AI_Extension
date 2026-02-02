@@ -1,4 +1,18 @@
 
+document.querySelectorAll('.tab-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const target = button.getAttribute('data-target');
+
+    // 1. Remove active class from all buttons and panes
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+    // 2. Add active class to clicked button and target pane
+    button.classList.add('active');
+    document.getElementById(target).classList.add('active');
+  });
+});
+
 document.getElementById("summarize").addEventListener("click", async () => {
   console.log("Clicked Summarize");
   const resultDiv = document.getElementById("result");
