@@ -29,7 +29,7 @@ document.getElementById("summarize").addEventListener("click", async () => {
       return;
     } 
     try {
-      const summary = await getQwenSummary(res.text, summaryType);
+      const summary = await getAiSummary(res.text, summaryType);
       resultDiv.innerText = summary;
     } catch (error) {
       resultDiv.innerText = `Error: ${error.message}`;
@@ -58,7 +58,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
   }
 });
 
-async function getQwenSummary(text, summaryType) {
+async function getAiSummary(text, summaryType) {
   console.log("Working on summary");
   const url = "http://localhost:11434/api/chat";
   
@@ -96,3 +96,93 @@ async function getQwenSummary(text, summaryType) {
     return "Error: Make sure Ollama is running and OLLAMA_ORIGINS is set.";
   }
 }
+
+
+// 1. Initialize chat history with an optional system message
+let chatHistory = [
+  { role: 'system', content: 'Use the provided article context to answer questions.'}
+];
+
+async function handleChat() {
+  document.getElementById("query-btn").disabled = true;
+  const inputField = document.getElementById("chatQuery");
+  const userText = inputField.value.trim();
+
+  if (!userText) return;
+
+  // 1. Add User message
+  appendMessage("user", userText);
+  chatHistory.push({ role: "user", content: userText });
+  inputField.value = ""; 
+
+  // 2. Show Typing Indicator
+  showTypingIndicator();
+
+  try {
+    
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "qwen2.5-coder:3b",
+        messages: chatHistory,
+        stream: false
+      }),
+    });
+    document.getElementById("query-btn").disabled = false;
+
+    const data = await response.json();
+    const aiMessage = data.message.content;
+
+    // 3. Remove Indicator and Add AI response
+    removeTypingIndicator();
+    appendMessage("assistant", aiMessage);
+    chatHistory.push({ role: "assistant", content: aiMessage });
+
+  } catch (error) {
+    removeTypingIndicator();
+    document.getElementById("query-btn").disabled = false;
+    appendMessage("error", "Failed to connect to Ollama.");
+  }
+}
+
+// Helper functions for the indicator
+function showTypingIndicator() {
+  const chatDisplay = document.getElementById("chat-history");
+  const typingDiv = document.createElement("div");
+  typingDiv.id = "typing-bubble";
+  typingDiv.className = "typing-indicator";
+  typingDiv.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
+  chatDisplay.appendChild(typingDiv);
+  chatDisplay.scrollTop = chatDisplay.scrollHeight;
+}
+
+function removeTypingIndicator() {
+  const indicator = document.getElementById("typing-bubble");
+  if (indicator) indicator.remove();
+}
+
+function appendMessage(role, text) {
+  const chatDisplay = document.getElementById("chat-history");
+  const msgDiv = document.createElement("div");
+  
+  // Apply the classes (user or assistant)
+  msgDiv.className = `message ${role}`;
+  msgDiv.innerText = text;
+
+  chatDisplay.appendChild(msgDiv);
+
+  // Smooth scroll to the latest message
+  chatDisplay.scrollTo({
+    top: chatDisplay.scrollHeight,
+    behavior: 'smooth'
+  });
+}
+
+document.getElementById("chatQuery").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    handleChat();
+  }
+});
+// Event Listener
+document.getElementById("query-btn").addEventListener("click", handleChat);
