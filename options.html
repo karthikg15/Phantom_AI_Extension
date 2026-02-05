@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Settings | PHANTOM.AI Tool</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    body {
+      width: 550px;
+      margin: 0 auto;
+      background-color: var(--bg);
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      padding: 40px 20px;
+    }
+
+    .settings-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--primary); }
+    p.subtitle { color: var(--text-light); margin-top: 8px; font-size: 14px; }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      margin-bottom: 24px;
+    }
+
+    h3 { font-size: 16px; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+
+    /* Model Selector Styling */
+    .field-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-light); }
+    
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background-color: #fff;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+    /* Connection Badge */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .online { background: #dcfce7; color: #166534; }
+    .offline { background: #fee2e2; color: #991b1b; }
+
+    /* Instructions List */
+    .steps { list-style: none; padding: 0; margin: 0; }
+    .step-item {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .step-dot {
+      width: 22px; height: 22px; background: #eff6ff; color: var(--primary);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 11px; flex-shrink: 0;
+    }
+    .inline-code {
+    background-color: #f4f4f4;
+    color: #d63384;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+    }
+
+    button#save-settings {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.2s;
+    }
+    button#save-settings:hover { background: #1d4ed8; }
+    button#save-settings:active { transform: scale(0.98); }
+  </style>
+</head>
+<body>
+  <div class="settings-container">
+    <header>
+      <h1>Welcome to PHANTOM.AI</h1>
+      <p class="subtitle">An ai chrome extension that runs locally on your machine</p>
+    </header>
+
+    <div class="card">
+      <h3>Settings</h3>
+      <div class="field-group">
+        <label for="model-select">Active Model</label>
+        <select id="model-select">
+          <option value="">Scanning for local models...</option>
+        </select>
+        <div id="status-container">
+            <div id="connection-status" class="status-badge offline">Checking connection...</div>
+        </div>
+      </div>
+      <button id="save-settings">Save & Apply Changes</button>
+    </div>
+
+    <div class="card">
+      <h3>Setup Guide</h3>
+      <div class="steps">
+        <div class="step-item">
+          <div class="step-dot">1</div>
+          <div>Download <strong>Ollama</strong> on your machine.
+               And download an AI model of your liking and system requirements. 
+            </div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">2</div>
+          <div>Create a new system environment variable: <br>   <code class="inline-code">OLLAMA_ORIGINS="chrome-extension://*"</code></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">3</div>
+          <div>Make sure ollama is running.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot">4</div>
+          <div>Select an AI model in your extension settings.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

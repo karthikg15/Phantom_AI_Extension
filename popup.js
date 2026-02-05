@@ -60,17 +60,16 @@ document.getElementById("copy-btn").addEventListener("click", () => {
 
 async function getAiSummary(text, summaryType) {
   console.log("Working on summary");
+  const storage = await chrome.storage.local.get(['selectedModel']);
+  const activeModel = storage.selectedModel || 'qwen2.5-coder:3b'; // Fallback if none selected
+
   const url = "http://localhost:11434/api/chat";
-  
   const data = {
-    model: "qwen2.5-coder:3b",
+    model: activeModel, // Use the dynamic variable
     messages: [
-      { 
-        role: "user", 
-        content: `Summarize the following content as ${summaryType}: ${text}` 
-      }
+      { role: "user", content: `Summarize this as ${summaryType}: ${text}` }
     ],
-    stream: false // Set to false so you get the whole response at once
+    stream: false
   };
 
   try {
@@ -186,3 +185,12 @@ document.getElementById("chatQuery").addEventListener("keypress", (e) => {
 });
 // Event Listener
 document.getElementById("query-btn").addEventListener("click", handleChat);
+
+
+document.getElementById("open-settings").addEventListener("click", () => {
+  try {
+    window.open(chrome.runtime.getURL('options.html'));
+  } catch (error) {
+    appendMessage("Error", error);
+  }
+});
