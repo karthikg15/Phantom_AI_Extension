@@ -104,7 +104,8 @@ async function handleChat() {
 
   try {
     const storage = await chrome.storage.local.get(['selectedModel']);
-    const activeModel = storage.selectedModel; // Fallback if none selected
+    const activeModel = storage.selectedModel; 
+    
     const response = await fetch("http://localhost:11434/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
