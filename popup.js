@@ -14,54 +14,40 @@ document.querySelectorAll('.tab-btn').forEach(button => {
 });
 
 document.getElementById("summarize").addEventListener("click", async () => {
-  console.log("Clicked Summarize");
-  const resultDiv = document.getElementById("result");
-  const summaryType = document.getElementById("summary-type").value;
-  
-  resultDiv.innerHTML = '<div class="loading"><div class="loader"></div></div>';
+  const resultContainer = document.getElementById("result");
+  const textContainer = document.getElementById("summary-text");
+  const type = document.getElementById("summary-type").value;
 
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  // Show container and add loading state
+  resultContainer.classList.add("active");
+  textContainer.innerText = "Generating summary...";
 
-  chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
-
-    if (chrome.runtime.lastError || !res?.text) {
-      resultDiv.innerText = "Could not extract text. Ensure you are on a webpage and refresh.";
-      return;
-    } 
-    try {
-      const summary = await getAiSummary(res.text, summaryType);
-      resultDiv.innerText = summary;
-    } catch (error) {
-      resultDiv.innerText = `Error: ${error.message}`;
-    }
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
+      if (res?.text) {
+        const summary = await getAiSummary(res.text, type);
+        textContainer.innerText = summary;
+      }
+    });
   });
 });
 
+// Copy logic
 document.getElementById("copy-btn").addEventListener("click", () => {
-  const summaryText = document.getElementById("result").innerText;
-
-  if (summaryText && summaryText.trim() !== "") {
-    navigator.clipboard
-      .writeText(summaryText)
-      .then(() => {
-        const copyBtn = document.getElementById("copy-btn");
-        const originalText = copyBtn.innerText;
-
-        copyBtn.innerText = "Copied!";
-        setTimeout(() => {
-          copyBtn.innerText = originalText;
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-      });
-  }
+  const text = document.getElementById("summary-text").innerText;
+  navigator.clipboard.writeText(text);
+  
+  // Quick visual feedback
+  const btn = document.getElementById("copy-btn");
+  btn.style.color = "#10b981";
+  setTimeout(() => btn.style.color = "#64748b", 1000);
 });
+
 
 async function getAiSummary(text, summaryType) {
   console.log("Working on summary");
   const storage = await chrome.storage.local.get(['selectedModel']);
-  const activeModel = storage.selectedModel || 'qwen2.5-coder:3b'; // Fallback if none selected
+  const activeModel = storage.selectedModel; // Fallback if none selected
 
   const url = "http://localhost:11434/api/chat";
   const data = {
@@ -193,4 +179,29 @@ document.getElementById("open-settings").addEventListener("click", () => {
   } catch (error) {
     appendMessage("Error", error);
   }
+});
+
+// Function to switch tabs
+function switchTab(targetId) {
+  // 1. Update Buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-target') === targetId);
+  });
+
+  // 2. Update Content Panes
+  document.querySelectorAll('.tab-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === targetId);
+  });
+}
+
+// Listener for the shortcut button
+document.getElementById('go-to-summarize').addEventListener('click', () => {
+  switchTab('summary-tab');
+});
+
+// Update your existing tab-nav listener to use the switchTab function
+document.querySelectorAll('.tab-nav .tab-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    switchTab(button.getAttribute('data-target'));
+  });
 });
