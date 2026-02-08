@@ -1,36 +1,35 @@
 
-document.querySelectorAll('.tab-btn').forEach(button => {
-  button.addEventListener('click', () => {
-    const target = button.getAttribute('data-target');
-
-    // 1. Remove active class from all buttons and panes
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-
-    // 2. Add active class to clicked button and target pane
-    button.classList.add('active');
-    document.getElementById(target).classList.add('active');
-  });
-});
-
 document.getElementById("summarize").addEventListener("click", async () => {
   const resultContainer = document.getElementById("result");
   const textContainer = document.getElementById("summary-text");
   const type = document.getElementById("summary-type").value;
 
-  // Show container and add loading state
+  // 1. Show container and inject the loading animation
   resultContainer.classList.add("active");
-  textContainer.innerText = "Generating summary...";
+  textContainer.innerHTML = `
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="loading-pulse">PHANTOM.AI is reading...</div>
+    </div>
+  `;
 
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
       if (res?.text) {
-        const summary = await getAiSummary(res.text, type);
-        textContainer.innerText = summary;
+        try {
+          const summary = await getAiSummary(res.text, type);
+          // 2. Replace animation with the actual text
+          textContainer.innerText = summary;
+        } catch (error) {
+          textContainer.innerHTML = `<span style="color: #ef4444;">Connection lost. check Ollama.</span>`;
+        }
+      } else {
+        textContainer.innerText = "Unable to read page content refresh the page and try again.";
       }
     });
   });
 });
+
 
 // Copy logic
 document.getElementById("copy-btn").addEventListener("click", () => {
@@ -104,12 +103,13 @@ async function handleChat() {
   showTypingIndicator();
 
   try {
-    
+    const storage = await chrome.storage.local.get(['selectedModel']);
+    const activeModel = storage.selectedModel; // Fallback if none selected
     const response = await fetch("http://localhost:11434/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "qwen2.5-coder:3b",
+        model: activeModel,
         messages: chatHistory,
         stream: false
       }),
@@ -203,5 +203,25 @@ document.getElementById('go-to-summarize').addEventListener('click', () => {
 document.querySelectorAll('.tab-nav .tab-btn').forEach(button => {
   button.addEventListener('click', () => {
     switchTab(button.getAttribute('data-target'));
+  });
+});
+
+document.querySelectorAll('.tab-nav .tab-btn').forEach((button, index) => {
+  button.addEventListener('click', () => {
+    const targetId = button.getAttribute('data-target');
+    const indicator = document.getElementById('tab-indicator');
+
+    // 1. Move the indicator: index 0 is left, index 1 is right
+    // We move it by 100% of its own width
+    indicator.style.transform = `translateX(${index * 100}%)`;
+
+    // 2. Update active states for styles
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
+
+    // 3. Show/Hide the corresponding tab content
+    document.querySelectorAll('.tab-pane').forEach(pane => {
+      pane.classList.toggle('active', pane.id === targetId);
+    });
   });
 });
