@@ -253,7 +253,7 @@ function handleEmailSummary(emailText) {
   // 1. Prepare UI
   resultContainer.classList.add("active");
   emailActions.style.display = "none"; // Hide button until summary is done
-  textContainer.innerHTML = `<div class="spinner"></div>`;
+  textContainer.innerHTML = `<div class="spinner"></div><div class="loading-pulse">PHANTOM.AI is reading...</div>`;
 
   // 2. Get Summary
   getAiSummary(prompt).then(summary => {
@@ -266,50 +266,60 @@ function handleEmailSummary(emailText) {
 
 // Handle the reply generation
 document.getElementById("generate-reply-btn").addEventListener("click", async () => {
-  const replyDisplay = document.getElementById("reply-result");
-  replyDisplay.innerText = "Drafting...";
+  const replyContainer = document.getElementById("reply-output-container");
+  const replyResult = document.getElementById("reply-result");
+  
+  replyContainer.style.display = "block"; // Show the container
+  replyResult.innerText = "Drafting...";
 
   try {
-    // Custom prompt for drafting
-    const prompt = `Read this email: "${emailBodyForReply}". Suggest a professional and concise reply`;
-    const reply = await getAiSummary(prompt); // Reusing your AI caller
-    replyDisplay.innerText = reply;
+    const prompt = `Draft a professional reply to: ${emailBodyForReply}`;
+    const reply = await getAiSummary(prompt);
+    replyResult.innerText = reply;
   } catch (e) {
-    replyDisplay.innerText = "Failed to generate reply.";
+    replyResult.innerText = "Error drafting reply.";
   }
+});
+
+// Add Copy Reply functionality
+document.getElementById("copy-reply-btn").addEventListener("click", () => {
+  const text = document.getElementById("reply-result").innerText;
+  navigator.clipboard.writeText(text);
+  
+  // Visual feedback
+  const icon = document.querySelector("#copy-reply-btn svg");
+  icon.style.stroke = "#10b981";
+  setTimeout(() => icon.style.stroke = "currentColor", 2000);
 });
 
 
 async function getEmailData() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // 1. Expand the safety check to include other providers
-  const isEmailSite = tab.url.includes("mail.google.com") || 
-                      tab.url.includes("outlook.live.com") || 
-                      tab.url.includes("mail.yahoo.com");
-
-  if (!isEmailSite) {
-    console.error("Not a supported email provider tab.");
-    return;
-  }
-
-  // 2. The message sending logic stays the same
-// Inside your getEmailData function
-  chrome.tabs.sendMessage(tab.id, { type: "EXTRACT_EMAIL" }, (response) => {
-    // Check for the "Port Closed" or "Could not establish connection" error
-    if (chrome.runtime.lastError) {
-      console.warn("Retrying connection...");
-      // If it fails, it usually means the content script isn't loaded. 
-      // You can't programmatically fix a missing script easily without a refresh.
-      alert("PHANTOM.AI is having trouble reading Gmail. Please refresh the Gmail tab and try again.");
+  // Try to send the message
+  chrome.tabs.sendMessage(tab.id, { type: "EXTRACT_EMAIL" }, async (response) => {
+    
+    // Check for the "Receiving end does not exist" error
+    if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes("Receiving end does not exist")) {
+      console.warn("Content script missing. Attempting to re-inject...");
+      
+      // Manually inject the script into the tab
+      try {
+        await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["content.js"]
+        });
+        
+        // After injection, wait 100ms and try sending the message again
+        setTimeout(() => getEmailData(), 100);
+      } catch (err) {
+        alert("Please refresh Gmail to enable PHANTOM.AI.");
+      }
       return;
     }
 
     if (response && response.body) {
       handleEmailSummary(response.body);
-    } else {
-      alert("Email content not found. Are you sure an email is open?");
     }
   });
 }
-

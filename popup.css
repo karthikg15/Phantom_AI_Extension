@@ -10,15 +10,6 @@ h2 {
     margin-bottom: 15px;
 }
 
-.options {
-  display: flex;
-  width: 100%;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
 button {
     padding: 8px 15px;
     background-color: #4285f4;
@@ -30,10 +21,13 @@ button {
 }
 
 #summary-type {
-  padding: 6px;
+  flex: 1;
+  border: none !important; /* Remove all individual borders */
   border-radius: 6px;
-  border: 1px solid #ccc;
-  min-width: 120px;
+  border-right: 1px solid #e2e8f0 !important; /* Keep ONLY the middle divider */
+  padding: 10px;
+  background: white;
+  outline: none;
 }
 
 #result {
@@ -241,12 +235,11 @@ button {
 
 .options {
   display: flex;
-  width: 100%;       /* Occupy full container width */
-  margin-bottom: 15px;
-  gap: 0;            /* Remove the space between buttons for a unified look */
-  border: 1px solid #e2e8f0; /* Outer border for the "bar" */
-  border-radius: 8px;
-  overflow: hidden;  /* Rounds the corners of the inner buttons */
+  width: 100%;
+  border: 1px solid #e2e8f0; /* Outer border for the whole bar */
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
 
 /* Make every item inside the options row grow equally */
@@ -269,16 +262,6 @@ button {
   border-right: none;
 }
 
-#copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #64748b;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  transition: color 0.2s;
-}
 
 #summary-text {
   padding: 12px;
@@ -330,4 +313,182 @@ button {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+
+#result {
+  display: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden; /* Prevents text from leaking out */
+  background: white;
+}
+
+#result.active {
+  display: block;
+}
+
+.result-header {
+  display: flex !important; /* Ensure it stays a row */
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+
+#copy-btn:hover {
+  color: #2563eb !important;
+}
+
+#generate-reply-btn {
+  display: block;
+  width: auto; /* Don't force full width if not needed */
+  margin-bottom: 8px;
+  margin-right: 12px; 
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#reply-result {
+  padding: 12px;
+  background-color: #f8fafc; /* Light background to define the text area */
+  border-radius: 6px;
+  line-height: 1.5;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+}
+
+/* Moves Suggest a Reply button to the right */
+.reply-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+#generate-reply-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+#generate-reply-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Ensure consistent styling for both copy buttons */
+#copy-btn, #copy-reply-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+#copy-btn:hover, #copy-reply-btn:hover {
+  color: #2563eb;
+}
+
+
+
+
+
+
+#summarize {
+  flex: 1;
+  border: none !important; /* Remove all individual borders */
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Wrapper to push button to the right */
+.reply-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 0;
+  border: none; /* Ensure no container borders */
+}
+
+#generate-reply-btn {
+  background: #2563eb;
+  color: white;
+  border: none; /* Removes the side lines you're seeing */
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+  transition: transform 0.1s, background 0.2s;
+}
+
+#generate-reply-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+#generate-reply-btn:active {
+  transform: translateY(0);
+}
+
+#reply-output-container {
+  margin-top: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  overflow: hidden; /* Ensures background colors don't bleed past corners */
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.reply-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+/* This targets the container that creates the line above the button */
+#email-actions {
+  display: none; /* Keep your JS toggle logic */
+  margin-top: 16px;
+  padding-top: 4px;
+  
+  /* REMOVE THIS LINE: */
+  border-top: none !important; 
+  
+  background: transparent;
+}
+
+/* Ensure the button container itself doesn't have a border */
+.reply-button-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  border: none !important;
+  padding: 0;
 }
