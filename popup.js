@@ -253,7 +253,11 @@ function handleEmailSummary(emailText) {
   // 1. Prepare UI
   resultContainer.classList.add("active");
   emailActions.style.display = "none"; // Hide button until summary is done
-  textContainer.innerHTML = `<div class="spinner"></div><div class="loading-pulse">PHANTOM.AI is reading...</div>`;
+  textContainer.innerHTML = `<div class="loading-container">
+                                <div class="spinner"></div>
+                                <div class="loading-pulse">Phantom is reading your email...</div>
+                              </div>
+                            `;
 
   // 2. Get Summary
   getAiSummary(prompt).then(summary => {
@@ -269,15 +273,23 @@ document.getElementById("generate-reply-btn").addEventListener("click", async ()
   const replyContainer = document.getElementById("reply-output-container");
   const replyResult = document.getElementById("reply-result");
   
-  replyContainer.style.display = "block"; // Show the container
-  replyResult.innerText = "Drafting...";
+  // 1. Show the container and the centered loading animation
+  replyContainer.style.display = "block";
+  replyResult.innerHTML = `
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="loading-pulse">PHANTOM.AI is drafting a reply...</div>
+    </div>
+  `;
 
   try {
     const prompt = `Draft a professional reply to: ${emailBodyForReply}`;
     const reply = await getAiSummary(prompt);
+    
+    // 2. Replace the animation with the final text
     replyResult.innerText = reply;
   } catch (e) {
-    replyResult.innerText = "Error drafting reply.";
+    replyResult.innerHTML = `<div style="text-align: center; color: #ef4444; padding: 10px;">Error drafting reply.</div>`;
   }
 });
 

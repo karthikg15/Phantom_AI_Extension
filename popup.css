@@ -492,3 +492,19 @@ button {
   border: none !important;
   padding: 0;
 }
+
+/* This container wraps both the spinner and the "Phantom is reading" text */
+.loading-container {
+  display: flex !important;
+  flex-direction: column !important; /* Stack spinner on top of text */
+  align-items: center !important;    /* Horizontal center */
+  justify-content: center !important; /* Vertical center */
+  width: 100% !important;
+  min-height: 100px;                 /* Gives it enough room to look centered */
+  padding: 10px 0;
+}
+
+/* Ensure the spinner itself doesn't have odd margins */
+.spinner {
+  margin: 0 auto 5px auto !important; 
+}
