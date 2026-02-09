@@ -1,33 +1,41 @@
 
 document.getElementById("summarize").addEventListener("click", async () => {
-  const resultContainer = document.getElementById("result");
-  const textContainer = document.getElementById("summary-text");
-  const type = document.getElementById("summary-type").value;
-
-  // 1. Show container and inject the loading animation
-  resultContainer.classList.add("active");
-  textContainer.innerHTML = `
-    <div class="loading-container">
-      <div class="spinner"></div>
-      <div class="loading-pulse">PHANTOM.AI is reading...</div>
-    </div>
-  `;
-
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-    chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
-      if (res?.text) {
-        try {
-          const summary = await getAiSummary(res.text, type);
-          // 2. Replace animation with the actual text
-          textContainer.innerText = summary;
-        } catch (error) {
-          textContainer.innerHTML = `<span style="color: #ef4444;">Connection lost. check Ollama.</span>`;
-        }
-      } else {
-        textContainer.innerText = "Unable to read page content refresh the page and try again.";
-      }
-    });
+    const isMail = tab.url.includes("mail.google.com") || tab.url.includes("outlook.live.com");
+
+    if (isMail) {
+      getEmailData(); // Use the specialized email scraper
+    } else {
+      const resultContainer = document.getElementById("result");
+      const textContainer = document.getElementById("summary-text");
+      const type = document.getElementById("summary-type").value;
+
+      // 1. Show container and inject the loading animation
+      resultContainer.classList.add("active");
+      textContainer.innerHTML = `
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <div class="loading-pulse">PHANTOM.AI is reading...</div>
+        </div>
+      `;
+      chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
+          if (res?.text) {
+            try {
+              const summary = await getAiSummary(res.text, type);
+              // 2. Replace animation with the actual text
+              textContainer.innerText = summary;
+            } catch (error) {
+              textContainer.innerHTML = `<span style="color: #ef4444;">Connection lost. check Ollama.</span>`;
+            }
+          } else {
+            textContainer.innerText = "Unable to read page content refresh the page and try again.";
+          }
+        });
+      });
+    }
   });
+  
 });
 
 
@@ -43,6 +51,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
 });
 
 
+// Ollama run - AI summary
 async function getAiSummary(text, summaryType) {
   console.log("Working on summary");
   const storage = await chrome.storage.local.get(['selectedModel']);
@@ -82,7 +91,7 @@ async function getAiSummary(text, summaryType) {
 }
 
 
-// 1. Initialize chat history with an optional system message
+// Chat history 
 let chatHistory = [
   { role: 'system', content: 'Use the provided article context to answer questions.'}
 ];
@@ -170,10 +179,11 @@ document.getElementById("chatQuery").addEventListener("keypress", (e) => {
     handleChat();
   }
 });
-// Event Listener
+
+
 document.getElementById("query-btn").addEventListener("click", handleChat);
 
-
+// Settings page
 document.getElementById("open-settings").addEventListener("click", () => {
   try {
     window.open(chrome.runtime.getURL('options.html'));
@@ -226,3 +236,63 @@ document.querySelectorAll('.tab-nav .tab-btn').forEach((button, index) => {
     });
   });
 });
+
+
+function handleEmailSummary(emailText) {
+  const resultContainer = document.getElementById("result");
+  const textContainer = document.getElementById("summary-text");
+  const type = document.getElementById("summary-type").value;
+
+  // 1. Show the result container and your loading animation
+  resultContainer.classList.add("active");
+  textContainer.innerHTML = `
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <div class="loading-pulse">Phantom is reading your email...</div>
+    </div>
+  `;
+
+  // 2. Send the email text to your AI (Ollama/Qwen)
+  getAiSummary(emailText, type)
+    .then(summary => {
+      textContainer.innerText = summary;
+    })
+    .catch(error => {
+      textContainer.innerHTML = `<span style="color: #ef4444;">Error summarizing email.</span>`;
+    });
+}
+
+
+async function getEmailData() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+  // 1. Expand the safety check to include other providers
+  const isEmailSite = tab.url.includes("mail.google.com") || 
+                      tab.url.includes("outlook.live.com") || 
+                      tab.url.includes("mail.yahoo.com");
+
+  if (!isEmailSite) {
+    console.error("Not a supported email provider tab.");
+    return;
+  }
+
+  // 2. The message sending logic stays the same
+// Inside your getEmailData function
+  chrome.tabs.sendMessage(tab.id, { type: "EXTRACT_EMAIL" }, (response) => {
+    // Check for the "Port Closed" or "Could not establish connection" error
+    if (chrome.runtime.lastError) {
+      console.warn("Retrying connection...");
+      // If it fails, it usually means the content script isn't loaded. 
+      // You can't programmatically fix a missing script easily without a refresh.
+      alert("PHANTOM.AI is having trouble reading Gmail. Please refresh the Gmail tab and try again.");
+      return;
+    }
+
+    if (response && response.body) {
+      handleEmailSummary(response.body);
+    } else {
+      alert("Email content not found. Are you sure an email is open?");
+    }
+  });
+}
+
