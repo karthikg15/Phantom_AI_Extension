@@ -22,7 +22,8 @@ document.getElementById("summarize").addEventListener("click", async () => {
         chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
           if (res?.text) {
             try {
-              const summary = await getAiSummary(res.text, type);
+              const prompt = `Summarize this as ${type}: ${res.text}`;
+              const summary = await getAiSummary(prompt);
               // 2. Replace animation with the actual text
               textContainer.innerText = summary;
             } catch (error) {
@@ -52,7 +53,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
 
 
 // Ollama run - AI summary
-async function getAiSummary(text, summaryType) {
+async function getAiSummary(text) {
   console.log("Working on summary");
   const storage = await chrome.storage.local.get(['selectedModel']);
   const activeModel = storage.selectedModel; // Fallback if none selected
@@ -61,7 +62,7 @@ async function getAiSummary(text, summaryType) {
   const data = {
     model: activeModel, // Use the dynamic variable
     messages: [
-      { role: "user", content: `Summarize this as ${summaryType}: ${text}` }
+      { role: "user", content: text }
     ],
     stream: false
   };
@@ -238,29 +239,45 @@ document.querySelectorAll('.tab-nav .tab-btn').forEach((button, index) => {
 });
 
 
+// Variable to hold the body for the reply prompt
+let emailBodyForReply = "";
+
 function handleEmailSummary(emailText) {
+  emailBodyForReply = emailText; // Store for the reply function
   const resultContainer = document.getElementById("result");
   const textContainer = document.getElementById("summary-text");
+  const emailActions = document.getElementById("email-actions");
   const type = document.getElementById("summary-type").value;
+  const prompt = `Summarzie this mail ${emailText} summary type: ${type}`;
 
-  // 1. Show the result container and your loading animation
+  // 1. Prepare UI
   resultContainer.classList.add("active");
-  textContainer.innerHTML = `
-    <div class="loading-container">
-      <div class="spinner"></div>
-      <div class="loading-pulse">Phantom is reading your email...</div>
-    </div>
-  `;
+  emailActions.style.display = "none"; // Hide button until summary is done
+  textContainer.innerHTML = `<div class="spinner"></div>`;
 
-  // 2. Send the email text to your AI (Ollama/Qwen)
-  getAiSummary(emailText, type)
-    .then(summary => {
-      textContainer.innerText = summary;
-    })
-    .catch(error => {
-      textContainer.innerHTML = `<span style="color: #ef4444;">Error summarizing email.</span>`;
-    });
+  // 2. Get Summary
+  getAiSummary(prompt).then(summary => {
+    textContainer.innerText = summary;
+    
+    // 3. Reveal the Reply button ONLY after summary is ready
+    emailActions.style.display = "block";
+  });
 }
+
+// Handle the reply generation
+document.getElementById("generate-reply-btn").addEventListener("click", async () => {
+  const replyDisplay = document.getElementById("reply-result");
+  replyDisplay.innerText = "Drafting...";
+
+  try {
+    // Custom prompt for drafting
+    const prompt = `Read this email: "${emailBodyForReply}". Suggest a professional and concise reply`;
+    const reply = await getAiSummary(prompt); // Reusing your AI caller
+    replyDisplay.innerText = reply;
+  } catch (e) {
+    replyDisplay.innerText = "Failed to generate reply.";
+  }
+});
 
 
 async function getEmailData() {
