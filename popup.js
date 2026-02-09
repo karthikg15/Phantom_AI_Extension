@@ -308,30 +308,38 @@ document.getElementById("copy-reply-btn").addEventListener("click", () => {
 async function getEmailData() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  // Try to send the message
-  chrome.tabs.sendMessage(tab.id, { type: "EXTRACT_EMAIL" }, async (response) => {
+  // 1. Silent Handshake (The Ping)
+  chrome.tabs.sendMessage(tab.id, { type: "PING" }, async (response) => {
     
-    // Check for the "Receiving end does not exist" error
-    if (chrome.runtime.lastError && chrome.runtime.lastError.message.includes("Receiving end does not exist")) {
-      console.warn("Content script missing. Attempting to re-inject...");
+    // 2. Catch the error if the script isn't there
+    if (chrome.runtime.lastError || !response) {
+      console.log("PHANTOM.AI: Content script missing. Automating re-injection...");
       
-      // Manually inject the script into the tab
       try {
+        // 3. Force the script back into the page
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           files: ["content.js"]
         });
         
-        // After injection, wait 100ms and try sending the message again
-        setTimeout(() => getEmailData(), 100);
+        // 4. Wait a moment for the listener to mount, then retry
+        setTimeout(() => executeExtraction(tab.id), 100);
       } catch (err) {
+        console.error("PHANTOM.AI: Critical Injection Error", err);
         alert("Please refresh Gmail to enable PHANTOM.AI.");
       }
-      return;
+    } else {
+      // 5. If response is 'ready', go straight to extraction
+      executeExtraction(tab.id);
     }
+  });
+}
 
-    if (response && response.body) {
-      handleEmailSummary(response.body);
+// Separate function for the actual extraction to keep code clean
+function executeExtraction(tabId) {
+  chrome.tabs.sendMessage(tabId, { type: "EXTRACT_EMAIL" }, (res) => {
+    if (res && res.body) {
+      handleEmailSummary(res.body);
     }
   });
 }

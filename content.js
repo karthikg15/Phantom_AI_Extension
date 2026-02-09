@@ -77,15 +77,12 @@ function extractGmailContent() {
   return null;
 }
 
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "EXTRACT_EMAIL") {
-    // We call the extraction
-    const data = extractGmailContent();
-    
-    // Even if data is null, we send a response so the port doesn't hang
-    sendResponse(data);
+  if (request.type === "PING") {
+    sendResponse({ status: "ready" });
+  } else if (request.type === "EXTRACT_EMAIL") {
+    sendResponse(extractGmailContent());
   }
-  
-  // CRITICAL: Returning true keeps the message channel open for asynchronous responses.
   return true; 
 });
