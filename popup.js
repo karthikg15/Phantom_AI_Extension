@@ -255,7 +255,7 @@ function handleEmailSummary(emailText) {
   emailActions.style.display = "none"; // Hide button until summary is done
   textContainer.innerHTML = `<div class="loading-container">
                                 <div class="spinner"></div>
-                                <div class="loading-pulse">Phantom is reading your email...</div>
+                                <div class="loading-pulse">PHANTOM.AI is reading your email...</div>
                               </div>
                             `;
 
@@ -326,7 +326,7 @@ async function getEmailData() {
         setTimeout(() => executeExtraction(tab.id), 100);
       } catch (err) {
         console.error("PHANTOM.AI: Critical Injection Error", err);
-        alert("Please refresh Gmail to enable PHANTOM.AI.");
+        alert("Please refresh mail to enable PHANTOM.AI.");
       }
     } else {
       // 5. If response is 'ready', go straight to extraction
