@@ -17,8 +17,21 @@ document.getElementById("summarize").addEventListener("click", async () => {
           <div class="loading-pulse">PHANTOM.AI is reading...</div>
         </div>
       `;
+
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+
+        if (!tab.url.startsWith('http')) {
+          textContainer.innerText = "Phantom can't run on browser internal pages.";
+          return;
+        }
+
         chrome.tabs.sendMessage(tab.id, { type: "GET_ARTICLE_TEXT" }, async (res) => {
+
+          if (chrome.runtime.lastError) {
+            console.log("Connection failed");
+            return;
+          }
+
           if (res?.text) {
             try {
               const lengthLimit = (type === 'brief') ? "under 120 words" : "thoroughly";
@@ -49,6 +62,7 @@ document.getElementById("copy-btn").addEventListener("click", () => {
   btn.style.color = "#10b981";
   setTimeout(() => btn.style.color = "#64748b", 1000);
 });
+
 
 
 // Ollama run - AI summary function

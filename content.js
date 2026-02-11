@@ -17,22 +17,20 @@ function extractGeneralContent() {
 }
 
 
+
 // Article Extraction
 function getArticleText() {
   try {
-    const docClone = document.cloneNode(true);
-    const article = new Readability(docClone).parse();
-
-    if (article && article.textContent) {
-      articleTitle = article.title;
-      return article.textContent.trim().replace(/\s\s+/g, ' ');
-    } else {
-      console.warn("Readability could not find an article on this page.");
-      return "Could not extract article text.";
+    const article = new Readability(document.cloneNode(true)).parse();
+    if (article && article.textContent.trim().length > 100) {
+      return article.textContent;
     }
-  } catch (error) {
-    console.error("Extraction error:", error);
-    return "Error extracting text.";
+    
+    const bodyText = document.body.innerText.trim();
+    return bodyText.length > 0 ? bodyText : "No readable content found.";
+  } catch (err) {
+    console.error("PHANTOM.AI: Extraction error", err);
+    return "Error reading page content.";
   }
 }
 
@@ -40,6 +38,7 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.type === "GET_ARTICLE_TEXT") {
     const text = getArticleText();
     sendResponse({ text });
+    return true; 
   }
 });
 
