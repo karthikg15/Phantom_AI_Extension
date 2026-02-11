@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await response.json();
       
       if (data.models) {
-        // Success state
         statusBadge.textContent = "Ollama Online";
         statusBadge.className = "status-badge online";
         
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
     } catch (err) {
-      // Error state
       statusBadge.textContent = "Ollama Offline";
       statusBadge.className = "status-badge offline";
       modelSelect.innerHTML = '<option value="">No models detected</option>';

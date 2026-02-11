@@ -1,19 +1,36 @@
+// In content.js
+function extractGeneralContent() {
+  const article = new Readability(document.cloneNode(true)).parse();
+  if (article && article.textContent.length > 200) {
+    return { type: "ARTICLE", text: article.textContent };
+  }
+
+  const bodyText = document.body.innerText
+    .replace(/\s\s+/g, ' ')
+    .trim();
+
+  if (bodyText.length > 100) {
+    return { type: "GENERAL", text: bodyText };
+  }
+
+  return { type: "ERROR", text: null };
+}
+
+
+
 // Article Extraction
 function getArticleText() {
   try {
-    const docClone = document.cloneNode(true);
-    const article = new Readability(docClone).parse();
-
-    if (article && article.textContent) {
-      articleTitle = article.title;
-      return article.textContent.trim().replace(/\s\s+/g, ' ');
-    } else {
-      console.warn("Readability could not find an article on this page.");
-      return "Could not extract article text.";
+    const article = new Readability(document.cloneNode(true)).parse();
+    if (article && article.textContent.trim().length > 100) {
+      return article.textContent;
     }
-  } catch (error) {
-    console.error("Extraction error:", error);
-    return "Error extracting text.";
+    
+    const bodyText = document.body.innerText.trim();
+    return bodyText.length > 0 ? bodyText : "No readable content found.";
+  } catch (err) {
+    console.error("PHANTOM.AI: Extraction error", err);
+    return "Error reading page content.";
   }
 }
 
@@ -21,12 +38,12 @@ chrome.runtime.onMessage.addListener((req, sender, sendResponse) => {
   if (req.type === "GET_ARTICLE_TEXT") {
     const text = getArticleText();
     sendResponse({ text });
+    return true; 
   }
 });
 
 
 // Mail Extraction 
-
 const PROVIDERS = {
   "mail.google.com": {
     body: ".a3s.aiL",
@@ -43,8 +60,6 @@ const PROVIDERS = {
 };
 
 function extractGmailContent() {
-  // 1. Try common Gmail body selectors
-  // .a3s is standard, .adn is for conversation view, [role="main"] is a fallback
   const bodySelectors = ['.a3s.aiL', '.adn.ads', '[role="main"] .ii.gt', '.m14623dcb877eef15'];
   
   let emailBody = null;
@@ -53,7 +68,6 @@ function extractGmailContent() {
     if (emailBody && emailBody.innerText.trim().length > 10) break; 
   }
 
-  // 2. Try the subject
   const subject = document.querySelector('h2.hP')?.innerText || "No Subject";
 
   if (emailBody) {
@@ -63,7 +77,6 @@ function extractGmailContent() {
     };
   }
 
-  // 3. Fallback: Check inside iframes (for some clipped or formatted mails)
   const iframes = document.querySelectorAll('iframe');
   for (let frame of iframes) {
     try {
