@@ -1,6 +1,6 @@
 # PHANTOM.AI
 
-**PHANTOM.AI** is an **AI-powered chrome extension**. It allows you to chat with AI, summarize complex articles, and draft professional mail replies—all while keeping your data local. It uses ollama to run AI models locally on your system.
+**PHANTOM.AI** is an **AI-powered chrome extension**. It allows you to chat with AI, summarize complex articles, and draft professional mail replies, all while keeping your data local. It uses ollama to run AI models locally on your system.
 
 ## Features:
 
