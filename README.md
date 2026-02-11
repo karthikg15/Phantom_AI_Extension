@@ -27,7 +27,7 @@ This is a guide on how to use the extension. Follow the steps given below.
 1. Clone this repo on your system.
 
     ```
-    git clone https://github.com/karthikg15/AI_Extension.git
+    git clone https://github.com/karthikg15/Phantom_AI_Extension.git
     ```
 
 2. Create a new system environment variable:
