@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Settings | PHANTOM.AI Tool</title>
   <style>
@@ -9,8 +10,41 @@
       --card: #ffffff;
       --text: #1e293b;
       --text-light: #64748b;
+      --border: #e2e8f0;
       --success: #10b981;
       --error: #ef4444;
+      --input-bg: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+
+      :root:not([data-theme="light"]),
+      [data-theme="dark"] {
+        --bg: #0f172a;
+        --card: #1e293b;
+        --text: #f1f5f9;
+        --text-light: #94a3b8;
+        --border: #334155;
+        --input-bg: #0f172a;
+      }
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f1f5f9;
+      --text-light: #94a3b8;
+      --border: #334155;
+      --input-bg: #0f172a;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --input-bg: #ffffff;
     }
 
     body {
@@ -32,34 +66,64 @@
       text-align: center;
     }
 
-    h1 { font-size: 24px; font-weight: 800; margin: 0; color: var(--primary); }
-    p.subtitle { color: var(--text-light); margin-top: 8px; font-size: 14px; }
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      margin: 0;
+      color: var(--primary);
+    }
+
+    p.subtitle {
+      color: var(--text-light);
+      margin-top: 8px;
+      font-size: 14px;
+    }
 
     .card {
       background: var(--card);
       border-radius: 16px;
       padding: 24px;
-      border: 1px solid #e2e8f0;
+      border: 1px solid var(--border);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
       margin-bottom: 24px;
     }
 
-    h3 { font-size: 16px; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px; }
+    h3 {
+      font-size: 16px;
+      margin: 0 0 16px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-    .field-group { margin-bottom: 20px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--text-light); }
-    
+    .field-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-light);
+    }
+
     select {
       width: 100%;
       padding: 12px;
       border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      background-color: #fff;
+      border: 1px solid var(--border);
+      background-color: var(--input-bg);
+      color: var(--text);
       font-size: 14px;
       outline: none;
       transition: border-color 0.2s;
     }
-    select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
 
     .status-badge {
       display: inline-flex;
@@ -71,10 +135,23 @@
       font-weight: 600;
       margin-top: 8px;
     }
-    .online { background: #dcfce7; color: #166534; }
-    .offline { background: #fee2e2; color: #991b1b; }
 
-    .steps { list-style: none; padding: 0; margin: 0; }
+    .online {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .offline {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .steps {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
     .step-item {
       display: flex;
       gap: 12px;
@@ -82,17 +159,27 @@
       font-size: 14px;
       line-height: 1.5;
     }
+
     .step-dot {
-      width: 22px; height: 22px; background: #eff6ff; color: var(--primary);
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 11px; flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      background: #eff6ff;
+      color: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      flex-shrink: 0;
     }
+
     .inline-code {
-    background-color: #f4f4f4;
-    color: #d63384;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
+      background-color: #f4f4f4;
+      color: #d63384;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
     }
 
     button#save-settings {
@@ -106,10 +193,17 @@
       cursor: pointer;
       transition: transform 0.1s, background 0.2s;
     }
-    button#save-settings:hover { background: #1d4ed8; }
-    button#save-settings:active { transform: scale(0.98); }
+
+    button#save-settings:hover {
+      background: #1d4ed8;
+    }
+
+    button#save-settings:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
+
 <body>
   <div class="settings-container">
     <header>
@@ -125,9 +219,19 @@
           <option value="">Scanning for local models...</option>
         </select>
         <div id="status-container">
-            <div id="connection-status" class="status-badge offline">Checking connection...</div>
+          <div id="connection-status" class="status-badge offline">Checking connection...</div>
         </div>
       </div>
+
+      <div class="field-group">
+        <label for="theme-select">Appearance</label>
+        <select id="theme-select">
+          <option value="system">System (Automatic)</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
       <button id="save-settings">Save & Apply Changes</button>
     </div>
 
@@ -137,12 +241,13 @@
         <div class="step-item">
           <div class="step-dot">1</div>
           <div>Download <strong>Ollama</strong> on your machine.
-               And download an AI model of your liking and system requirements. 
-            </div>
+            And download an AI model of your liking and system requirements.
+          </div>
         </div>
         <div class="step-item">
           <div class="step-dot">2</div>
-          <div>Create a new system environment variable: <br>   <code class="inline-code">OLLAMA_ORIGINS="chrome-extension://*"</code></div>
+          <div>Create a new system environment variable: <br> <code
+              class="inline-code">OLLAMA_ORIGINS="chrome-extension://*"</code></div>
         </div>
         <div class="step-item">
           <div class="step-dot">3</div>
@@ -157,4 +262,5 @@
   </div>
   <script src="options.js"></script>
 </body>
+
 </html>

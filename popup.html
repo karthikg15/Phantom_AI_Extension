@@ -1,81 +1,126 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Phantom AI</title>
-    <link rel="stylesheet" href="popup.css">
-  </head>
-  <body>
-    <div class="header">
-      <h1>PHANTOM.AI</h1>
-      <button id="open-settings" class="icon-btn" title="Settings">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
-      </button>
-    </div>
-      
-    <div class="tab-nav">
-      <div id="tab-indicator"></div>
 
-      <button class="tab-btn active" data-target="chat-tab">AI Chat</button>
-      <button class="tab-btn" data-target="summary-tab">Summary</button>
-    </div>
+<head>
+  <title>Phantom AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
 
-    <div class="tab-content">
-      <div id="chat-tab" class="tab-pane active">
-        <div class="chat-container">
-          
-          <div id="chat-history"></div>
-          
-          <div class="chat-input-row">
-            <input type="text" id="chatQuery" placeholder="Ask a question...">
-            <button id="query-btn">Send</button>
-          </div>
-        </div>
-      </div>
+<body>
+  <div class="header">
+    <h1>PHANTOM.AI</h1>
+    <button id="open-settings" class="icon-btn" title="Settings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+        </path>
+      </svg>
+    </button>
+  </div>
 
-      <div id="summary-tab" class="tab-pane">
-        <div class="summary-container">
-          <div class="options">
-            <select id="summary-type">
-              <option value="brief">Brief Summary</option>
-              <option value="detailed">Detailed Summary</option>
-              <option value="bullets">Bullet Points</option>
-            </select>
-            <button id="summarize">Summarize this page</button>
-          </div>
+  <div class="tab-nav">
+    <div id="tab-indicator"></div>
 
-          <div id="result">
-            <div class="result-header">
-              <span class="result-title">Summary</span>
-              <button id="copy-btn" title="Copy Summary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              </button>
-            </div>
-            <div id="summary-text"></div>
+    <button class="tab-btn active" data-target="chat-tab">AI Chat</button>
+    <button class="tab-btn" data-target="summary-tab">Summary</button>
+    <button class="tab-btn" data-target="grammar-tab">Grammar</button>
+  </div>
 
-            <div id="email-actions">
-              <div class="reply-button-container">
-                <button id="generate-reply-btn">Suggest a Reply</button>
-              </div>
+  <div class="tab-content">
+    <div id="chat-tab" class="tab-pane active">
+      <div class="chat-container">
 
-              <div id="reply-output-container">
-                <div class="reply-header">
-                  <span class="reply-title">Suggested Reply</span>
-                  <button id="copy-reply-btn" title="Copy Reply">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                  </button>
-                </div>
-                <div id="reply-result"></div>
-              </div>
-            </div>
-          </div>
+        <div id="chat-history"></div>
 
+        <div class="chat-input-row">
+          <input type="text" id="chatQuery" placeholder="Ask a question...">
+          <button id="query-btn">Send</button>
         </div>
       </div>
     </div>
-      
-    <script src="popup.js"></script>
-  </body>
+
+    <div id="summary-tab" class="tab-pane">
+      <div class="summary-container">
+        <div class="options">
+          <select id="summary-type">
+            <option value="brief">Brief Summary</option>
+            <option value="detailed">Detailed Summary</option>
+            <option value="bullets">Bullet Points</option>
+          </select>
+          <button id="summarize">Summarize this page</button>
+        </div>
+
+        <div id="result">
+          <div class="result-header">
+            <span class="result-title">Summary</span>
+            <button id="copy-btn" title="Copy Summary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+          <div id="summary-text"></div>
+
+          <div id="email-actions">
+            <div class="reply-button-container">
+              <button id="generate-reply-btn">Suggest a Reply</button>
+            </div>
+
+            <div id="reply-output-container">
+              <div class="reply-header">
+                <span class="reply-title">Suggested Reply</span>
+                <button id="copy-reply-btn" title="Copy Reply">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+              </div>
+              <div id="reply-result"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="grammar-tab" class="tab-pane">
+      <div class="grammar-container">
+        <label for="grammar-input"
+          style="font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block;"></label>
+        <textarea id="grammar-input" placeholder="Paste or type text here..."
+          style="width: 100%; height: 100px; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; resize: none;"></textarea>
+
+        <button id="check-grammar-btn"
+          style="width: 100%; margin: 12px 0; background: var(--primary); color: white; padding: 10px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;">Check
+          Grammar</button>
+
+        <div id="grammar-result-container"
+          style="display: none; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-main);">
+          <div class="result-header">
+            <span class="result-title">Corrected Text</span>
+            <button id="copy-grammar-btn" title="Copy Corrected Text"
+              style="background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
+          <div id="grammar-result-text"
+            style="padding: 12px; font-size: 13px; line-height: 1.5; color: var(--text-main);">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
 </html>

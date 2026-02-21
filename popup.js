@@ -1,4 +1,11 @@
 
+// Initialize theme
+chrome.storage.local.get(['selectedTheme'], (res) => {
+  if (res.selectedTheme) {
+    document.documentElement.setAttribute('data-theme', res.selectedTheme);
+  }
+});
+
 document.getElementById("summarize").addEventListener("click", async () => {
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     const isMail = tab.url.includes("mail.google.com") || tab.url.includes("outlook.live.com") || tab.url.includes("mail.yahoo.com");
@@ -329,3 +336,33 @@ function executeExtraction(tabId) {
     }
   });
 }
+
+
+// Grammar Check logic
+document.getElementById('check-grammar-btn').addEventListener('click', async () => {
+  const inputArea = document.getElementById('grammar-input');
+  const resultContainer = document.getElementById('grammar-result-container');
+  const resultText = document.getElementById('grammar-result-text');
+  const text = inputArea.value.trim();
+
+  if (!text) return;
+
+  resultContainer.style.display = 'block';
+  resultText.innerHTML = `<div class='loading-container'><div class='spinner'></div><div class='loading-pulse'>PHANTOM.AI is checking grammar...</div></div>`;
+
+  try {
+    const prompt = `Correct the grammar and spelling of this text. Return ONLY the corrected text, no chat or explanations: ${text}`;
+    const corrected = await getAiSummary(prompt);
+    resultText.innerText = corrected.trim();
+  } catch (error) {
+    resultText.innerHTML = `<span style='color: #ef4444;'>Error checking grammar.</span>`;
+  }
+});
+
+document.getElementById('copy-grammar-btn').addEventListener('click', () => {
+  const text = document.getElementById('grammar-result-text').innerText;
+  navigator.clipboard.writeText(text);
+  const icon = document.querySelector('#copy-grammar-btn svg');
+  icon.style.stroke = '#10b981';
+  setTimeout(() => icon.style.stroke = 'currentColor', 2000);
+}); 
