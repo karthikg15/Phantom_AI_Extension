@@ -1,3 +1,5 @@
+let currentArticleContext = '';
+let articleChatHistory = [];
 
 // Initialize theme
 chrome.storage.local.get(['selectedTheme'], (res) => {
@@ -47,6 +49,12 @@ document.getElementById("summarize").addEventListener("click", async () => {
               const summary = await getAiSummary(prompt);
               const cleanSummary = summary.replace(/\*\*/g, '');
               textContainer.innerText = cleanSummary;
+
+              // Enable article chat
+              currentArticleContext = res.text;
+              articleChatHistory = [{ role: 'system', content: `You are an AI assistant. Use the following article context to answer questions: ${currentArticleContext}` }];
+              document.getElementById("article-chat-container").style.display = "block";
+              document.getElementById("article-chat-history").innerHTML = "";
             } catch (error) {
               textContainer.innerHTML = `<span style="color: #ef4444;">Connection lost. check Ollama.</span>`;
             }
@@ -365,4 +373,66 @@ document.getElementById('copy-grammar-btn').addEventListener('click', () => {
   const icon = document.querySelector('#copy-grammar-btn svg');
   icon.style.stroke = '#10b981';
   setTimeout(() => icon.style.stroke = 'currentColor', 2000);
-}); 
+});
+// Contextual Article Chat logic
+async function handleArticleChat() {
+  const inputField = document.getElementById("article-query");
+  const userText = inputField.value.trim();
+  const chatHistory = document.getElementById("article-chat-history");
+
+  if (!userText || !currentArticleContext) return;
+
+  // Append user message
+  const userMsg = document.createElement("div");
+  userMsg.className = "article-msg user";
+  userMsg.innerText = userText;
+  chatHistory.appendChild(userMsg);
+
+  articleChatHistory.push({ role: "user", content: userText });
+  inputField.value = "";
+  chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  // Loading indicator for article chat
+  const loadingMsg = document.createElement("div");
+  loadingMsg.className = "article-msg loading";
+  loadingMsg.innerText = "PHANTOM is thinking...";
+  chatHistory.appendChild(loadingMsg);
+
+  try {
+    const storage = await chrome.storage.local.get(['selectedModel']);
+    const activeModel = storage.selectedModel;
+
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: activeModel,
+        messages: articleChatHistory,
+        stream: false
+      }),
+    });
+
+    const data = await response.json();
+    const aiMessage = data.message.content;
+
+    loadingMsg.remove();
+
+    const assistantMsg = document.createElement("div");
+    assistantMsg.className = "article-msg assistant";
+    assistantMsg.innerText = aiMessage;
+    chatHistory.appendChild(assistantMsg);
+
+    articleChatHistory.push({ role: "assistant", content: aiMessage });
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+  } catch (error) {
+    loadingMsg.innerText = "Error connecting to Ollama.";
+    loadingMsg.className = "article-msg error";
+  }
+}
+
+document.getElementById("article-query-btn").addEventListener("click", handleArticleChat);
+document.getElementById("article-query").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") handleArticleChat();
+});
+

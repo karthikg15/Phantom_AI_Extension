@@ -497,3 +497,115 @@ button {
     opacity: 1;
   }
 }
+
+/* Modern Article Chat Styles */
+.article-chat-box {
+  display: none;
+  border-top: 1px solid var(--border-color);
+  padding: 16px;
+  background: var(--bg-light);
+  border-bottom-left-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+.article-chat-header {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--bg-track);
+  border-radius: var(--radius-pill);
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.article-chat-history {
+  max-height: 180px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 4px;
+}
+
+.article-chat-history::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-input-row.compact {
+  margin-top: 0;
+  gap: 8px;
+  padding: 4px;
+  background: var(--bg-main);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-color);
+}
+
+.chat-input-row.compact input {
+  flex: 1;
+  font-size: 13px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+}
+
+.chat-input-row.compact button {
+  padding: 8px 20px;
+  font-size: 13px;
+  background: var(--user-msg-bg);
+  border-radius: var(--radius-pill);
+  color: white;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.chat-input-row.compact button:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+}
+
+.article-msg {
+  max-width: 90%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  line-height: 1.4;
+  font-size: 13px;
+}
+
+.article-msg.user {
+  align-self: flex-end;
+  background: var(--user-msg-bg);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.article-msg.assistant {
+  align-self: flex-start;
+  background: var(--assistant-msg-bg);
+  color: var(--text-main);
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--border-color);
+}
+
+.article-msg.loading {
+  align-self: flex-start;
+  background: var(--bg-main);
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 11px;
+  border: 1px dashed var(--border-color);
+}
