@@ -4,7 +4,7 @@ document.getElementById("summarize").addEventListener("click", async () => {
     const isMail = tab.url.includes("mail.google.com") || tab.url.includes("outlook.live.com") || tab.url.includes("mail.yahoo.com");
 
     if (isMail) {
-      getEmailData(); 
+      getEmailData();
     } else {
       const resultContainer = document.getElementById("result");
       const textContainer = document.getElementById("summary-text");
@@ -36,7 +36,7 @@ document.getElementById("summarize").addEventListener("click", async () => {
             try {
               const lengthLimit = (type === 'brief') ? "under 120 words" : "thoroughly";
               const prompt = `Summarize this as ${type} in ${lengthLimit}. Plain text only, no markdown: ${res.text}`;
-            
+
               const summary = await getAiSummary(prompt);
               const cleanSummary = summary.replace(/\*\*/g, '');
               textContainer.innerText = cleanSummary;
@@ -50,7 +50,7 @@ document.getElementById("summarize").addEventListener("click", async () => {
       });
     }
   });
-  
+
 });
 
 
@@ -69,11 +69,11 @@ document.getElementById("copy-btn").addEventListener("click", () => {
 async function getAiSummary(text) {
   console.log("Working on summary");
   const storage = await chrome.storage.local.get(['selectedModel']);
-  const activeModel = storage.selectedModel; 
+  const activeModel = storage.selectedModel;
 
   const url = "http://localhost:11434/api/chat";
   const data = {
-    model: activeModel, 
+    model: activeModel,
     messages: [
       { role: "user", content: text }
     ],
@@ -95,7 +95,7 @@ async function getAiSummary(text) {
 
     const result = await response.json();
     return result.message.content;
-    
+
   } catch (error) {
     console.error("Failed to connect to Ollama:", error);
     return "Error: Make sure Ollama is running and OLLAMA_ORIGINS is set.";
@@ -105,7 +105,7 @@ async function getAiSummary(text) {
 
 // Chat history 
 let chatHistory = [
-  { role: 'system', content: 'Use the provided article context to answer questions.'}
+  { role: 'system', content: 'Use the provided article context to answer questions.' }
 ];
 
 async function handleChat() {
@@ -117,14 +117,14 @@ async function handleChat() {
 
   appendMessage("user", userText);
   chatHistory.push({ role: "user", content: userText });
-  inputField.value = ""; 
+  inputField.value = "";
 
   showTypingIndicator();
 
   try {
     const storage = await chrome.storage.local.get(['selectedModel']);
-    const activeModel = storage.selectedModel; 
-    
+    const activeModel = storage.selectedModel;
+
     const response = await fetch("http://localhost:11434/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -171,15 +171,12 @@ function removeTypingIndicator() {
 function appendMessage(role, text) {
   const chatDisplay = document.getElementById("chat-history");
   const msgDiv = document.createElement("div");
-  
+
   msgDiv.className = `message ${role}`;
   msgDiv.innerText = text;
 
   chatDisplay.appendChild(msgDiv);
-  chatDisplay.scrollTo({
-    top: chatDisplay.scrollHeight,
-    behavior: 'smooth'
-  });
+  chatDisplay.scrollTop = chatDisplay.scrollHeight;
 }
 
 document.getElementById("chatQuery").addEventListener("keypress", (e) => {
@@ -239,18 +236,18 @@ document.querySelectorAll('.tab-nav .tab-btn').forEach((button, index) => {
 let emailBodyForReply = "";
 
 function handleEmailSummary(emailText) {
-  emailBodyForReply = emailText; 
+  emailBodyForReply = emailText;
   const resultContainer = document.getElementById("result");
   const textContainer = document.getElementById("summary-text");
   const emailActions = document.getElementById("email-actions");
 
   const type = document.getElementById("summary-type").value;
-  const lengthLimit = (type === 'brief') ? "under 120 words" : "thoroughly";     
+  const lengthLimit = (type === 'brief') ? "under 120 words" : "thoroughly";
   const prompt = `Summarzie this mail ${emailText} summary type: ${type} in ${lengthLimit}. Plain text only, no markdown:`;
 
 
   resultContainer.classList.add("active");
-  emailActions.style.display = "none"; 
+  emailActions.style.display = "none";
   textContainer.innerHTML = `<div class="loading-container">
                                 <div class="spinner"></div>
                                 <div class="loading-pulse">PHANTOM.AI is reading your email...</div>
@@ -260,7 +257,7 @@ function handleEmailSummary(emailText) {
   getAiSummary(prompt).then(summary => {
     const cleanSummary = summary.replace(/\*\*/g, '');
     textContainer.innerText = cleanSummary;
-    
+
     emailActions.style.display = "block";
   });
 }
@@ -269,7 +266,7 @@ function handleEmailSummary(emailText) {
 document.getElementById("generate-reply-btn").addEventListener("click", async () => {
   const replyContainer = document.getElementById("reply-output-container");
   const replyResult = document.getElementById("reply-result");
-  
+
   replyContainer.style.display = "block";
   replyResult.innerHTML = `
     <div class="loading-container">
@@ -279,7 +276,7 @@ document.getElementById("generate-reply-btn").addEventListener("click", async ()
   `;
 
   try {
-    const prompt = `Draft a professional reply to: ${emailBodyForReply}`;
+    const prompt = `Draft a professional reply to: ${emailBodyForReply}, make it 100-120 words`;
     const reply = await getAiSummary(prompt);
     const cleanReply = reply.replace(/\*\*/g, '');
     replyResult.innerText = cleanReply;
@@ -303,16 +300,16 @@ async function getEmailData() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   chrome.tabs.sendMessage(tab.id, { type: "PING" }, async (response) => {
-    
+
     if (chrome.runtime.lastError || !response) {
       console.log("PHANTOM.AI: Content script missing. Automating re-injection...");
-      
+
       try {
         await chrome.scripting.executeScript({
           target: { tabId: tab.id },
           files: ["content.js"]
         });
-        
+
         setTimeout(() => executeExtraction(tab.id), 100);
       } catch (err) {
         console.error("PHANTOM.AI: Critical Injection Error", err);
